@@ -32,14 +32,14 @@ module.exports = () => {
 
       // WebpackPwaManifest to generate PWA manifest file
       new WebpackPwaManifest({
-        name: 'Your App Name', // App name
-        short_name: 'App', // Short name for the app
-        description: 'Description of your app', // App description
+        name: 'Text Editor', // App name
+        short_name: 'textEditor', // Short name for the app
+        description: 'just another text editor', // App description
         background_color: '#ffffff', // Background color for the splash screen
         theme_color: '#000000', // Theme color for the app
         icons: [
           {
-            src: path.resolve('src/assets/icon.png'), // Path to the app icon
+            src: path.resolve('src/images/logo.png'), // Path to the app icon
             sizes: [96, 128, 192, 256, 384, 512] // Icon sizes
           }
         ]
@@ -47,8 +47,8 @@ module.exports = () => {
 
       // InjectManifest to inject service worker into the bundle
       new InjectManifest({
-        swSrc: './src/sw.js', // Path to the service worker source file
-        swDest: 'sw.js', // Output service worker filename
+        swSrc: './src/src-sw.js', // Path to the service worker source file
+        swDest: 'src-sw.js', // Output service worker filename
         exclude: [/\.map$/, /asset-manifest\.json$/], // Files to exclude from caching
       })
     ],
