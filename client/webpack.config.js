@@ -1,77 +1,92 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackPwaManifest = require('webpack-pwa-manifest');
 const path = require('path');
-const { InjectManifest } = require('workbox-webpack-plugin');
+const { InjectManifest, GenerateSW } = require('workbox-webpack-plugin');
 
-module.exports = () => {
+// TODO: Add and configure workbox plugins for a service worker and manifest file.
+// TODO: Add CSS loaders and babel to webpack.
+
+module.exports = (env, argv) => {
+  const isDevMode = argv.mode === 'development';
   return {
-    mode: 'development', // Set webpack mode to development
-
+    mode: 'production',
     entry: {
-      main: './src/js/index.js', // Entry point for the main bundle
-      install: './src/js/install.js' // Entry point for the install bundle
+      main: './src/js/index.js',
+      install: './src/js/install.js'
     },
-
     output: {
-      filename: '[name].bundle.js', // Output file name for each entry point
-      path: path.resolve(__dirname, 'dist'), // Output directory
+      filename: '[name].bundle.js',
+      path: path.resolve(__dirname, 'dist'),
+      publicPath: '/',
     },
-
+    devServer: {
+      static: {
+        directory: path.join(__dirname, 'dist'),
+      },
+      compress: true,
+      port: 9000,
+      hot: true,
+    },
+    watchOptions: {
+      ignored: /src-sw\.js$/, // exclude service worker source file from being watched
+    },
     plugins: [
-      // HTMLWebpackPlugin to generate HTML files
       new HtmlWebpackPlugin({
-        template: './src/index.html', // HTML template for the main bundle
-        filename: 'index.html', // Output HTML filename
-        chunks: ['main'] // Include only the 'main' bundle
+        template: './index.html', // path to your index.html file
       }),
-      new HtmlWebpackPlugin({
-        template: './src/install.html', // HTML template for the install bundle
-        filename: 'install.html', // Output HTML filename
-        chunks: ['install'] // Include only the 'install' bundle
-      }),
-
-      // WebpackPwaManifest to generate PWA manifest file
       new WebpackPwaManifest({
-        name: 'Text Editor', // App name
-        short_name: 'textEditor', // Short name for the app
-        description: 'just another text editor', // App description
-        background_color: '#ffffff', // Background color for the splash screen
-        theme_color: '#000000', // Theme color for the app
+        name: 'Just Another Text Editor',
+        short_name: 'Text Editor',
+        description: 'An application that allows you to save snippets of code in a simple text editor.',
+        background_color: '#01579b',
+        theme_color: '#ffffff',
+        start_url: '/',
         icons: [
           {
-            src: path.resolve('src/images/logo.png'), // Path to the app icon
-            sizes: [96, 128, 192, 256, 384, 512] // Icon sizes
-          }
-        ]
+            src: path.resolve(__dirname, 'src/images/logo.png'), // ensure the path is correct
+            sizes: [96, 128, 192, 256, 384, 512],
+            destination: path.join('assets', 'icons'),
+          },
+        ],
+        filename: 'manifest.json', // specify the filename
+        inject: true, // ensure the manifest is injected into the html
+        fingerprints: false, // remove fingerprints from the manifest
       }),
-
-      // InjectManifest to inject service worker into the bundle
       new InjectManifest({
-        swSrc: './src/src-sw.js', // Path to the service worker source file
-        swDest: 'src-sw.js', // Output service worker filename
-        exclude: [/\.map$/, /asset-manifest\.json$/], // Files to exclude from caching
-      })
+        swSrc: './src-sw.js',
+        swDest: 'service-worker.js',
+      }),
+      
     ],
 
     module: {
       rules: [
-        // CSS loader configuration
         {
-          test: /\.css$/, // Files ending with .css
-          use: ['style-loader', 'css-loader'] // Use style-loader and css-loader
+          test: /\.css$/,
+          use: ['style-loader', 'css-loader'],
         },
-
-        // Babel loader configuration for JavaScript files
         {
-          test: /\.js$/, // Files ending with .js
-          exclude: /node_modules/, // Exclude node_modules directory
+          test: /\.(png|jpe?g|gif|ico)$/i,
+          use: [
+            {
+              loader: 'file-loader',
+              options: {
+                name: '[name].[ext]', // This line is changed
+                outputPath: 'assets/icons/',
+              },
+            },
+          ],
+        },
+        {
+          test: /\.m?js$/,
+          exclude: /(node_modules|bower_components)/,
           use: {
-            loader: 'babel-loader', // Use babel-loader for transpilation
+            loader: 'babel-loader',
             options: {
-              presets: ['@babel/preset-env'] // Babel preset for environment compatibility
-            }
-          }
-        }
+              presets: ['@babel/preset-env'],
+            },
+          },
+        },
       ],
     },
   };

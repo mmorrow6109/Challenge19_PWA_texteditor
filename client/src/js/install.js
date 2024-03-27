@@ -1,40 +1,34 @@
-const butInstall = document.getElementById('buttonInstall');
-
-// Variable to store the beforeinstallprompt event
 let deferredPrompt;
 
+const butInstall = document.getElementById('buttonInstall');
+
 // Logic for installing the PWA
-// Add an event handler to the `beforeinstallprompt` event
+// TODO: Add an event handler to the `beforeinstallprompt` event
 window.addEventListener('beforeinstallprompt', (event) => {
-  // Prevent the default behavior
-  event.preventDefault();
-  // Store the event for later use
-  deferredPrompt = event;
-  // Show install button or similar UI element to the user
-  butInstall.style.display = 'block';
+    // Prevent Chrome 76 and later from showing the mini-infobar
+    event.preventDefault();
+    // Stash the event so it can be triggered later.
+    deferredPrompt = event;
+    // Show the install button
+    butInstall.removeAttribute('hidden');
 });
 
-// Implement a click event handler on the `butInstall` element
+// TODO: Implement a click event handler on the `butInstall` element
 butInstall.addEventListener('click', async () => {
-  if (deferredPrompt) {
-    // Show the install prompt
-    deferredPrompt.prompt();
-    // Wait for the user to respond to the prompt
-    const choiceResult = await deferredPrompt.userChoice;
-    if (choiceResult.outcome === 'accepted') {
-      console.log('User accepted the install prompt');
+    if (deferredPrompt) { // Check if deferredPrompt is defined
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User response to the install prompt: ${outcome}`);
+        butInstall.setAttribute('hidden', true);
     } else {
-      console.log('User dismissed the install prompt');
+        console.log('The beforeinstallprompt event has not been fired yet.');
     }
-    // Reset the deferredPrompt variable
-    deferredPrompt = null;
-    // Hide install button or similar UI element
-    butInstall.style.display = 'none';
-  }
 });
 
-// Add an event handler for the `appinstalled` event
+// TODO: Add an handler for the `appinstalled` event
 window.addEventListener('appinstalled', (event) => {
-  // Log the event or perform any other necessary actions
-  console.log('App installed successfully');
+    // Log the result of the prompt
+    console.log('Jate has been installed!', event);
+    // Hide the install button
+    butInstall.setAttribute('hidden', true);
 });

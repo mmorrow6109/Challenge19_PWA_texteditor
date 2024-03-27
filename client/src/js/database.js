@@ -7,37 +7,40 @@ const initdb = async () =>
         console.log('jate database already exists');
         return;
       }
-      db.createObjectStore('jate', { keyPath: 'id', autoIncrement: true });
+      db.createObjectStore('jate', { keyPath: 'id' });
       console.log('jate database created');
     },
   });
 
-// Method to add content to the database
-export const putDb = async (content) => {
-  try {
-    const db = await initdb();
-    const tx = db.transaction('jate', 'readwrite');
-    const store = tx.objectStore('jate');
-    await store.add(content);
-    console.log('Content added to the database:', content);
-  } catch (error) {
-    console.error('Error adding content to the database:', error);
-  }
-};
+  export const putDb = async (content) => {
+    try {
+      console.log(content, 'content to be saved');
+      const jateDB = await openDB('jate', 1);
+      const tx = jateDB.transaction('jate', 'readwrite');
+      const store = tx.objectStore('jate');
+      const request = store.put({ 
+        id: 1, 
+        content: content 
+      });
+      const result = await request;
+      jateDB.close();
+    } catch (error) {
+      console.error('Error replacing data in jate:', error);
+    }
+  };
+  
+  export const getDb = async () => {
+    try {
+      const jateDB = await openDB('jate', 1);
+      const tx = jateDB.transaction('jate', 'readonly');
+      const store = tx.objectStore('jate');
+      const request = store.get(1);
+      const result = await request;
+      jateDB.close();
+      return result.content;
+    } catch (error) {
+      console.error('Error getting data from jate:', error);
+    }
+  };
 
-// Method to get all content from the database
-export const getDb = async () => {
-  try {
-    const db = await initdb();
-    const tx = db.transaction('jate', 'readonly');
-    const store = tx.objectStore('jate');
-    const allContent = await store.getAll();
-    console.log('All content retrieved from the database:', allContent);
-    return allContent;
-  } catch (error) {
-    console.error('Error getting content from the database:', error);
-    return [];
-  }
-};
-
-initdb(); // Initialize the database when the module is imported
+initdb();
