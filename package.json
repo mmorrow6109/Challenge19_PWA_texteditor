@@ -1,27 +1,79 @@
 {
     "name": "JATE",
     "version": "1.0.0",
-    "description": "",
+    "description": "Your project description here",
     "main": "server.js",
     "scripts": {
-        "dev": "webpack-dev-server",
-        "start:dev": "concurrently \"cd server && npm run server\" \"cd client && npm run dev\"",
-        "start": "npm run build && cd server && node server.js",
-        "server": "cd server nodemon server.js --ignore client",
-        "build": "cd client && npm run build",
-        "install": "cd client && npm install",
-        "client": "cd client && npm start"
+      "dev": "webpack-dev-server",
+      "start:dev": "concurrently \"cd server && npm run server\" \"cd client && npm run dev\"",
+      "start": "npm run build && cd server && node server.js",
+      "server": "cd server && nodemon server.js --ignore client",
+      "build": "cd client && npm run build",
+      "install": "cd client && npm install",
+      "client": "cd client && npm start",
+      "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [],
     "author": "Matt Morrow",
     "license": "ISC",
     "dependencies": {
-        "core-js": "^3.36.1",
-        "express": "^4.17.1",
-        "if-env": "^1.0.4"
+      "core-js": "^3.36.1",
+      "express": "^4.17.1",
+      "if-env": "^1.0.4"
     },
     "devDependencies": {
-        "concurrently": "^5.2.0",
-        "nodemon": "^2.0.4"
+      "concurrently": "^5.2.0",
+      "nodemon": "^2.0.4",
+      "@babel/core": "^7.18.3",
+      "@babel/preset-env": "^7.18.3",
+      "@babel/plugin-transform-runtime": "^7.18.0",
+      "@babel/runtime": "^7.18.3",
+      "@babel/polyfill": "^7.18.0",
+      "webpack": "^5.66.0",
+      "webpack-cli": "^4.9.1",
+      "webpack-dev-server": "^4.7.3",
+      "workbox-webpack-plugin": "^6.3.0",
+      "webpack-pwa-manifest": "^5.3.0",
+      "babel-loader": "^8.2.3"
+    },
+    "browserslist": [
+      "> 0.2%",
+      "last 2 versions",
+      "not dead"
+    ],
+    "babel": {
+      "presets": [
+        "@babel/preset-env"
+      ],
+      "plugins": [
+        "@babel/plugin-transform-runtime"
+      ]
+    },
+    "workbox": {
+      "globDirectory": "client/dist",
+      "globPatterns": [
+        "**/*.{html,js,css}"
+      ],
+      "swDest": "client/dist/sw.js",
+      "clientsClaim": true,
+      "skipWaiting": true
+    },
+    "webpackPwaManifest": {
+      "name": "JATE",
+      "short_name": "JATE",
+      "description": "Text Editor",
+      "start_url": "/",
+      "background_color": "#ffffff",
+      "theme_color": "#ffffff",
+      "display": "standalone",
+      "icons": [
+        {
+          "src": "client/src/assets/icon.png",
+          "sizes": [96, 128, 192, 256, 384, 512],
+          "type": "image/png",
+          "purpose": "any maskable"
+        }
+      ]
     }
-}
+  }
+  
